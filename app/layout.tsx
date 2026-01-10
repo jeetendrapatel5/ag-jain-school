@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Marcellus, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
+import Nav from "@/components/sections/Nav";
 import Footer from "@/components/Footer";
 
 const jakarta = Plus_Jakarta_Sans({ 
@@ -34,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${jakarta.variable} ${marcellus.variable} ${dmSerif.variable} font-sans antialiased bg-slate-50 text-slate-900`}>
-        <Navbar />
+        <Nav />
         <main className="min-h-screen">
           {children}
         </main>
