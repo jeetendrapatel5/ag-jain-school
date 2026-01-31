@@ -11,7 +11,7 @@ export default function Nav() {
   };
 
   return (
-    <nav className="bg-white flex flex-col">
+    <nav className="bg-gray-100 flex flex-col">
       <div className="top flex flex-col md:flex-row items-center justify-between px-4 md:px-6 gap-4 my-5 lg:my-0">
         <div className="left flex-shrink-0">
           <Image 
@@ -23,11 +23,11 @@ export default function Nav() {
           />
         </div>
         
-        <div className="middle text-center flex-grow px-2">
-          <h2 className="text-lg md:text-2xl lg:text-3xl font-semibold text-blue-900 [word-spacing:0.3rem]">
+        <div className="middle text-center flex-grow">
+          <h2 className="text-lg md:text-2xl lg:text-4xl font-extrabold text-blue-900 [word-spacing:0.35rem]">
             Shree Amoluckchand Galada Jain
           </h2>
-          <h3 className="text-base md:text-xl lg:text-2xl text-blue-800">
+          <h3 className="text-base md:text-xl lg:text-2xl text-blue-800 font-semibold">
             Higher Secondary School
           </h3>
           <h4 className="text-xs md:text-sm lg:text-base text-blue-800 hidden md:block">
