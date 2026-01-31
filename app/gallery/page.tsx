@@ -1,9 +1,24 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { X, ChevronLeft, ChevronRight, Download, Share2 } from 'lucide-react';
+
+import React, { useState, useEffect } from 'react';
+import { X, ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 
-const galleryImages = [
+type GalleryImage = {
+  id: number;
+  src: string;
+  title: string;
+  category: string;
+  date: string;
+  height?: 'tall' | 'short' | 'normal';
+};
+
+type Category = {
+  id: string;
+  label: string;
+};
+
+const galleryImages: GalleryImage[] = [
   {
     id: 1,
     src: '/images/81.JPG',
@@ -73,48 +88,52 @@ const galleryImages = [
   }
 ];
 
-const categories = [
+const categories: Category[] = [
   { id: 'all', label: 'All Photos' },
   { id: 'events', label: 'Events' },
   { id: 'activities', label: 'Activities' },
   { id: 'sports', label: 'Sports' }
 ];
 
-export default function SchoolGallery() {
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState({});
+export default function SchoolGallery(){
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [imageLoaded, setImageLoaded] = useState<Record<number, boolean>>({});
 
-  const filteredImages = selectedCategory === 'all' 
-    ? galleryImages 
-    : galleryImages.filter(img => img.category === selectedCategory);
+  const filteredImages: GalleryImage[] =
+    selectedCategory === 'all'
+      ? galleryImages
+      : galleryImages.filter(img => img.category === selectedCategory);
 
-  const getCategoryCount = (categoryId) => {
+  // <-- Fixed: explicit type for categoryId to avoid implicit any -->
+  const getCategoryCount = (categoryId: string): number => {
     if (categoryId === 'all') return galleryImages.length;
     return galleryImages.filter(img => img.category === categoryId).length;
   };
 
-  const openLightbox = (image) => {
+  const openLightbox = (image: GalleryImage) => {
     setSelectedImage(image);
     setIsDialogOpen(true);
   };
 
-  const navigateImage = (direction) => {
+  const navigateImage = (direction: 'next' | 'prev') => {
+    if (!selectedImage) return;
     const currentIndex = filteredImages.findIndex(img => img.id === selectedImage.id);
-    let newIndex;
-    
+    if (currentIndex === -1) return;
+
+    let newIndex: number;
     if (direction === 'next') {
       newIndex = (currentIndex + 1) % filteredImages.length;
     } else {
       newIndex = (currentIndex - 1 + filteredImages.length) % filteredImages.length;
     }
-    
+
     setSelectedImage(filteredImages[newIndex]);
   };
 
   useEffect(() => {
-    const handleKeyPress = (e) => {
+    const handleKeyPress = (e: KeyboardEvent) => {
       if (!isDialogOpen) return;
       if (e.key === 'ArrowLeft') navigateImage('prev');
       if (e.key === 'ArrowRight') navigateImage('next');
@@ -123,21 +142,40 @@ export default function SchoolGallery() {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [isDialogOpen, selectedImage]);
+  }, [isDialogOpen, selectedImage, filteredImages]);
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: selectedImage.title,
-        text: `Check out this photo: ${selectedImage.title}`,
-      });
+  const handleShare = async () => {
+    if (!selectedImage) return;
+
+    const shareData = {
+      title: selectedImage.title,
+      text: `Check out this photo: ${selectedImage.title}`,
+      url: selectedImage.src
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData as ShareData);
+      } else if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        // Fallback: copy image url to clipboard
+        await navigator.clipboard.writeText(selectedImage.src);
+        // eslint-disable-next-line no-alert
+        alert('Image URL copied to clipboard');
+      } else {
+        // Last resort: open the image in a new tab for manual sharing
+        window.open(selectedImage.src, '_blank', 'noopener');
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Share failed:', err);
+      // eslint-disable-next-line no-alert
+      alert('Unable to share this image on your device.');
     }
   };
 
   return (
     <div className="bg-white min-h-screen pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
-        
         {/* Header */}
         <div className="mb-12 flex flex-col items-center text-center">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
@@ -153,7 +191,7 @@ export default function SchoolGallery() {
           {categories.map(category => {
             const count = getCategoryCount(category.id);
             const isActive = selectedCategory === category.id;
-            
+
             return (
               <button
                 key={category.id}
@@ -163,6 +201,8 @@ export default function SchoolGallery() {
                     ? 'bg-gray-900 text-white shadow-sm'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
+                aria-pressed={isActive}
+                type="button"
               >
                 {category.label}
                 <span className={`ml-1.5 text-xs ${isActive ? 'text-gray-300' : 'text-gray-500'}`}>
@@ -175,11 +215,16 @@ export default function SchoolGallery() {
 
         {/* Masonry Gallery Grid */}
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
-          {filteredImages.map((image) => (
+          {filteredImages.map((image: GalleryImage) => (
             <div
               key={image.id}
               onClick={() => openLightbox(image)}
               className="group cursor-pointer break-inside-avoid"
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') openLightbox(image);
+              }}
             >
               <div className="relative overflow-hidden rounded-xl bg-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
                 <div className={image.height === 'tall' ? 'aspect-[3/4]' : 'aspect-[4/3]'}>
@@ -192,7 +237,7 @@ export default function SchoolGallery() {
                     } group-hover:scale-105`}
                   />
                 </div>
-                
+
                 {/* Hover Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
@@ -215,9 +260,10 @@ export default function SchoolGallery() {
               </svg>
             </div>
             <p className="text-gray-600 text-lg">No photos found in this category</p>
-            <button 
+            <button
               onClick={() => setSelectedCategory('all')}
               className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
+              type="button"
             >
               View all photos
             </button>
@@ -226,7 +272,7 @@ export default function SchoolGallery() {
       </div>
 
       {/* Enhanced Lightbox */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isDialogOpen} onOpenChange={(open: boolean) => setIsDialogOpen(open)}>
         <DialogContent className="max-w-6xl p-0 bg-zinc-950 border-0">
           {selectedImage && (
             <>
@@ -237,12 +283,13 @@ export default function SchoolGallery() {
                     <h2 className="font-semibold text-lg">{selectedImage.title}</h2>
                     <p className="text-sm text-gray-300">{selectedImage.date}</p>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     <button
                       onClick={handleShare}
                       className="p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors backdrop-blur-sm"
                       title="Share"
+                      type="button"
                     >
                       <Share2 className="w-5 h-5" />
                     </button>
@@ -250,6 +297,7 @@ export default function SchoolGallery() {
                       onClick={() => setIsDialogOpen(false)}
                       className="p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors backdrop-blur-sm"
                       title="Close (Esc)"
+                      type="button"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -267,6 +315,7 @@ export default function SchoolGallery() {
                     }}
                     className="absolute left-6 top-1/2 -translate-y-1/2 z-50 p-3 rounded-full bg-white/90 hover:bg-white shadow-lg transition-all hover:scale-110"
                     title="Previous (←)"
+                    type="button"
                   >
                     <ChevronLeft className="w-6 h-6 text-gray-900" />
                   </button>
@@ -278,6 +327,7 @@ export default function SchoolGallery() {
                     }}
                     className="absolute right-6 top-1/2 -translate-y-1/2 z-50 p-3 rounded-full bg-white/90 hover:bg-white shadow-lg transition-all hover:scale-110"
                     title="Next (→)"
+                    type="button"
                   >
                     <ChevronRight className="w-6 h-6 text-gray-900" />
                   </button>
