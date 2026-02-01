@@ -181,7 +181,7 @@ export default function AmenitiesPage() {
                   colors={["#006eff", "#50c2fb", "#b4ff94", "#006eff"]}
                   animationSpeed={2}
                   showBorder={false}
-                  className="custom-class"
+                  className="custom-class rounded-none bg-transparent"
                 >
                   Innovation
                 </GradientText>
