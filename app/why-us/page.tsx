@@ -4,7 +4,7 @@ export default function WhyUsPage() {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative pt-40 pb-26 px-6 overflow-hidden">
+      <section className="relative pt-15 pb-26 px-6 overflow-hidden">
         <div className="max-w-7xl mx-auto text-center relative z-10">
           <h2 className="text-blue-600 font-semibold tracking-[0.2em] uppercase text-sm mb-14">
             The Institution of Choice

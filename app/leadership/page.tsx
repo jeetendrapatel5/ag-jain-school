@@ -4,7 +4,7 @@ export default function FacultyExcellence() {
   return (
     <div className="bg-[#fafaf9] text-slate-900 font-sans antialiased">
       {/* Hero Section */}
-      <section className="pt-35 pb-30 px-6 bg-white border-b border-slate-200 overflow-hidden relative">
+      <section className="pt-15 pb-30 px-6 bg-white border-b border-slate-200 overflow-hidden relative">
         <div className="absolute top-0 right-0 w-1/3 h-full bg-linear-to-l from-amber-50/80 to-transparent pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-amber-100 rounded-full blur-3xl opacity-20" />
         <div className="max-w-7xl mx-auto relative z-10">

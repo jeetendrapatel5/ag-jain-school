@@ -9,6 +9,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import LiquidEther from '@/components/LiquidEther';
+import GradientText from '@/components/GradientText';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -175,7 +176,16 @@ export default function AmenitiesPage() {
               <span className="hero-word inline-block">Where</span>
               <span className="hero-word inline-block text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400">Excellence</span>
               <span className="hero-word inline-block">Meets</span>
-              <span className="hero-word inline-block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400">Innovation</span>
+              <span className="hero-word inline-block text-transparent">
+                <GradientText
+                  colors={["#006eff", "#50c2fb", "#b4ff94", "#006eff"]}
+                  animationSpeed={2}
+                  showBorder={false}
+                  className="custom-class"
+                >
+                  Innovation
+                </GradientText>
+              </span>
             </div>
           </h1>
 

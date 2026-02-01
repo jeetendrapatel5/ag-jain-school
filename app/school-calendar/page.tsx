@@ -4,7 +4,7 @@ export default function EventsCalendar() {
   return (
     <div className="bg-[#fafaf9] text-slate-900 font-sans antialiased">
       {/* Hero Section */}
-      <section className="relative pt-44 pb-40 px-6 bg-slate-900 text-white overflow-hidden">
+      <section className="relative pt-15 pb-40 px-6 bg-slate-900 text-white overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0 opacity-20">
           <svg width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">

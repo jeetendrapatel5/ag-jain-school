@@ -4,7 +4,7 @@ export default function ContactPage() {
   return (
     <>
       {/* Header Section */}
-      <section className="pt-40 pb-32 px-6 text-center">
+      <section className="pt-15 pb-32 px-6 text-center">
         <h2 className="text-jain-gold font-bold tracking-[0.3em] uppercase text-xs mb-7">Connect With Us</h2>
         <h1 className="text-4xl md:text-5xl text-jain-slate mb-4">Get In Touch</h1>
         <p className="text-slate-500 max-w-xl mx-auto text-sm">

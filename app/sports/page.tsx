@@ -43,7 +43,7 @@ export default function SportsAthletics() {
   return (
     <div className="bg-[#0f172a] text-white font-sans antialiased">
       {/* Hero Section */}
-      <section className="relative py-44 px-6 overflow-hidden">
+      <section className="relative pt-15 pb-44 px-6 overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-b from-blue-600/20 via-transparent to-transparent" />
         <div className="absolute top-20 right-20 w-64 h-64 bg-blue-600 rounded-full blur-3xl opacity-10 animate-pulse" />
