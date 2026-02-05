@@ -14,9 +14,9 @@ if (typeof window !== 'undefined') {
 }
 
 export default function LifeAtAGJS() {
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const statsRef = useRef(null);
+  const statsRef = useRef<HTMLDivElement>(null);
   const [counters, setCounters] = useState({
     students: 0,
     states: 0,
@@ -58,236 +58,205 @@ export default function LifeAtAGJS() {
   ];
 
   useGSAP(() => {
-    // Professional fade-in for hero content
-    gsap.from('.hero-content > *', {
-      y: 30,
-      opacity: 0,
-      duration: 1,
-      stagger: 0.15,
-      ease: 'power3.out',
-      delay: 0.3
-    });
+    // 1. HERO - Enhanced Visibility (using fromTo to prevent elements staying invisible)
+    gsap.fromTo('.hero-content > *', 
+      { y: 30, opacity: 0 },
+      { y: 0, opacity: 1, duration: 1, stagger: 0.15, ease: 'power3.out', delay: 0.3 }
+    );
 
-    // Smooth reveal for sections on scroll
-    const sections = gsap.utils.toArray('.fade-section');
+    // 2. TYPESCRIPT FIX: Use explicit Casting for toArray
+    const sections = gsap.utils.toArray<HTMLElement>('.fade-section');
     sections.forEach((section) => {
-      gsap.from(section, {
-        scrollTrigger: {
-          trigger: section,
-          start: 'top 85%',
-          toggleActions: 'play none none none'
-        },
-        y: 40,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.out'
-      });
+      gsap.fromTo(section, 
+        { y: 40, opacity: 0 },
+        {
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 85%',
+            toggleActions: 'play none none none'
+          },
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: 'power2.out'
+        }
+      );
     });
 
-    // Timeline items - clean slide-in
-    gsap.utils.toArray('.timeline-item').forEach((item, i) => {
-      gsap.from(item, {
-        scrollTrigger: {
-          trigger: item,
-          start: 'top 85%',
-        },
-        x: i % 2 === 0 ? -30 : 30,
-        opacity: 0,
-        duration: 0.7,
-        ease: 'power2.out'
-      });
+    const timelineItems = gsap.utils.toArray<HTMLElement>('.timeline-item');
+    timelineItems.forEach((item, i) => {
+      gsap.fromTo(item,
+        { x: i % 2 === 0 ? -30 : 30, opacity: 0 },
+        {
+          scrollTrigger: {
+            trigger: item,
+            start: 'top 85%',
+          },
+          x: 0,
+          opacity: 1,
+          duration: 0.7,
+          ease: 'power2.out'
+        }
+      );
     });
 
-    // Activity cards - subtle stagger
-    gsap.utils.toArray('.activity-card').forEach((card, i) => {
-      gsap.from(card, {
-        scrollTrigger: {
-          trigger: card,
-          start: 'top 90%',
-        },
-        y: 30,
-        opacity: 0,
-        duration: 0.6,
-        delay: i * 0.05,
-        ease: 'power2.out'
-      });
+    const activityCards = gsap.utils.toArray<HTMLElement>('.activity-card');
+    activityCards.forEach((card, i) => {
+      gsap.fromTo(card,
+        { y: 30, opacity: 0 },
+        {
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 90%',
+          },
+          y: 0,
+          opacity: 1,
+          duration: 0.6,
+          delay: i * 0.05,
+          ease: 'power2.out'
+        }
+      );
     });
 
-    // Value cards
-    gsap.utils.toArray('.value-card').forEach((card, i) => {
-      gsap.from(card, {
-        scrollTrigger: {
-          trigger: card,
-          start: 'top 85%',
-        },
-        y: 20,
-        opacity: 0,
-        duration: 0.6,
-        delay: i * 0.08,
-        ease: 'power2.out'
-      });
+    const valueCards = gsap.utils.toArray<HTMLElement>('.value-card');
+    valueCards.forEach((card, i) => {
+      gsap.fromTo(card,
+        { y: 20, opacity: 0 },
+        {
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 85%',
+          },
+          y: 0,
+          opacity: 1,
+          duration: 0.6,
+          delay: i * 0.08,
+          ease: 'power2.out'
+        }
+      );
     });
 
   }, { scope: containerRef });
 
-  // Counter animation on scroll into view
+  // Counter animation logic
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && !hasAnimated) {
-            setHasAnimated(true);
-            animateCounters();
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
+    if (!statsRef.current) return;
+    
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !hasAnimated) {
+        setHasAnimated(true);
+        const targets = { students: 1000, states: 28, awards: 42, years: 85 };
+        const duration = 2000;
+        const fps = 60;
+        const totalFrames = (duration / 1000) * fps;
+        let frame = 0;
 
-    if (statsRef.current) {
-      observer.observe(statsRef.current);
-    }
+        const interval = setInterval(() => {
+          frame++;
+          const progress = 1 - Math.pow(1 - (frame / totalFrames), 3);
+          setCounters({
+            students: Math.floor(targets.students * progress),
+            states: Math.floor(targets.states * progress),
+            awards: Math.floor(targets.awards * progress),
+            years: Math.floor(targets.years * progress)
+          });
+          if (frame >= totalFrames) clearInterval(interval);
+        }, 1000 / fps);
+      }
+    }, { threshold: 0.5 });
 
+    observer.observe(statsRef.current);
     return () => observer.disconnect();
   }, [hasAnimated]);
 
-  const animateCounters = () => {
-    const targets = { students: 1000, states: 28, awards: 42, years: 85 };
-    const duration = 2000; // 2 seconds
-    const fps = 60;
-    const frames = (duration / 1000) * fps;
-    
-    let frame = 0;
-    const interval = setInterval(() => {
-      frame++;
-      const progress = frame / frames;
-      const easeProgress = 1 - Math.pow(1 - progress, 3); // easeOut cubic
-      
-      setCounters({
-        students: Math.floor(targets.students * easeProgress),
-        states: Math.floor(targets.states * easeProgress),
-        awards: Math.floor(targets.awards * easeProgress),
-        years: Math.floor(targets.years * easeProgress)
-      });
-
-      if (frame >= frames) {
-        clearInterval(interval);
-        setCounters(targets); // Ensure final values are exact
-      }
-    }, 1000 / fps);
-  };
-
-  // Clean testimonial rotation
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
     }, 6000);
     return () => clearInterval(interval);
-  }, []);
+  }, [testimonials.length]);
 
   return (
-    <div ref={containerRef} className="bg-white min-h-screen">
+    <div ref={containerRef} className="bg-white min-h-screen overflow-x-hidden">
       
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800">
-        {/* Subtle accent shapes */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl" />
-        
-        {/* Subtle grid pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:64px_64px]" />
 
         <div className="hero-content relative z-10 max-w-6xl mx-auto px-6 text-center py-20">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/1 rounded-full mb-8">
-            <div className="w-2 h-2 bg-cyan-400 rounded-full" />
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full mb-8">
+            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
             <span className="text-white/90 font-medium text-sm">Life at AG Jain School</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight">
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 tracking-tighter leading-tight">
             Where Every Day is
             <br />
             <span className="text-cyan-300">an Adventure</span>
           </h1>
 
           <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto mb-12 leading-relaxed">
-            Experience a vibrant community where 1,000+ students from across India unite to learn, grow, and create lasting memories.
+            Experience a vibrant community where <span className="text-white font-bold">1,000+ students</span> unite to learn, grow, and create lasting memories.
           </p>
 
-          {/* Animated Counter Stats */}
-          <div ref={statsRef} className="flex flex-wrap justify-center gap-8 mb-12">
+          <div ref={statsRef} className="flex flex-wrap justify-center gap-4 md:gap-8 mb-12">
             {[
               { value: counters.students, label: 'Students', suffix: '+' },
               { value: counters.states, label: 'States', suffix: '' },
               { value: counters.awards, label: 'Awards', suffix: '+' },
               { value: counters.years, label: 'Years', suffix: '' }
             ].map((stat, i) => (
-              <div key={i} className="relative group">
-                {/* Subtle glow on hover */}
-                <div className="absolute inset-0 bg-white/5 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative text-center px-6 py-4">
-                  <div className="text-4xl md:text-5xl font-bold text-white mb-1 tabular-nums">
-                    {stat.value}{stat.suffix}
-                  </div>
-                  <div className="text-sm text-blue-200">{stat.label}</div>
+              <div key={i} className="text-center px-6 py-4 bg-white/5 rounded-2xl backdrop-blur-sm min-w-[120px]">
+                <div className="text-3xl md:text-5xl font-bold text-white mb-1 tabular-nums">
+                  {stat.value}{stat.suffix}
                 </div>
+                <div className="text-xs md:text-sm text-blue-200 uppercase tracking-widest">{stat.label}</div>
               </div>
             ))}
           </div>
 
-          <button className="group inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-blue-50 transition-all">
+          <a href='/why-us' className="group inline-flex items-center gap-3 bg-white text-blue-600 px-10 py-5 rounded-full font-bold text-lg hover:bg-blue-50 transition-all shadow-xl">
             Explore Our World 
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </button>
+          </a>
         </div>
-
-        {/* Subtle decorative line at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
       </section>
 
-      {/* A Day in the Life */}
-      <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-gray-50 to-white relative">
-        {/* Subtle accent */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100/30 rounded-full blur-3xl" />
-        
+      {/* A Day in the Life (History/Schedule Section) - TIGHTER SPACING */}
+      <section className="py-24 md:py-32 px-6 bg-slate-50 relative">
         <div className="max-w-7xl mx-auto relative">
-          <div className="fade-section text-center mb-16 md:mb-20">
-            <div className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold mb-4">
+          <div className="fade-section text-center mb-16">
+            <div className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-xs font-black uppercase tracking-widest mb-4">
               Daily Routine
             </div>
-            <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4">A Day in the Life</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Every moment designed for growth, learning, and joy
-            </p>
+            <h2 className="text-4xl md:text-6xl font-bold text-slate-900 mb-4 tracking-tight">A Day in the Life</h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">Every moment designed for growth, learning, and joy.</p>
           </div>
 
-          {/* Timeline */}
           <div className="relative max-w-4xl mx-auto">
-            {/* Vertical line - desktop only */}
-            <div className="hidden md:block absolute left-1/2 transform -translate-x-px top-0 bottom-0 w-px bg-gradient-to-b from-blue-200 via-blue-300 to-blue-200" />
+            {/* Center Line */}
+            <div className="hidden md:block absolute left-1/2 transform -translate-x-px top-0 bottom-0 w-[2px] bg-slate-200" />
 
             {daySchedule.map((item, index) => (
-              <div 
-                key={index}
-                className={`timeline-item relative flex items-center mb-12 md:mb-16 ${
-                  index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
-                }`}
-              >
-                <div className={`w-full md:w-1/2 ${index % 2 === 0 ? 'md:pr-12 md:text-right' : 'md:pl-12'}`}>
-                  <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all">
-                    <div className={`inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600 rounded-xl mb-4 ${index % 2 === 0 ? 'md:ml-auto' : ''}`}>
-                      <item.icon className="w-6 h-6" />
+              <div key={index} className={`timeline-item relative flex items-center mb-10 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+                {/* Content - Reduced padding from 12 to 6 to tighten horizontal distance */}
+                <div className={`w-full md:w-1/2 ${index % 2 === 0 ? 'md:pr-8 md:text-right' : 'md:pl-8'}`}>
+                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all">
+                    <div className={`inline-flex items-center justify-center w-10 h-10 bg-blue-50 text-blue-600 rounded-lg mb-3 ${index % 2 === 0 ? 'md:ml-auto' : ''}`}>
+                      <item.icon className="w-5 h-5" />
                     </div>
-                    <div className="text-sm font-semibold text-gray-500 mb-2">{item.time}</div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
-                    <p className="text-gray-600 leading-relaxed">{item.desc}</p>
+                    <div className="text-[11px] font-black text-blue-500 uppercase mb-1">{item.time}</div>
+                    <h3 className="text-lg font-bold text-slate-900 mb-1 leading-tight">{item.title}</h3>
+                    <p className="text-sm text-slate-500 leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
 
                 {/* Center dot */}
-                <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2">
-                  <div className="w-4 h-4 bg-blue-600 rounded-full border-4 border-white shadow-sm" />
+                <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 z-10">
+                  <div className="w-3 h-3 bg-blue-600 rounded-full border-2 border-white ring-4 ring-slate-50" />
                 </div>
-
                 <div className="hidden md:block w-1/2" />
               </div>
             ))}
@@ -295,72 +264,38 @@ export default function LifeAtAGJS() {
         </div>
       </section>
 
-      {/* Activities */}
-      <section className="py-24 md:py-32 px-6 relative">
-        {/* Subtle background accent */}
-        <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-white to-transparent" />
-        
+      {/* Activities Grid */}
+      <section className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="fade-section text-center mb-16 md:mb-20">
-            <div className="inline-block px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold mb-4">
-              Co-Curricular Excellence
-            </div>
-            <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4">Beyond the Classroom</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Programs that nurture leadership, creativity, and character
-            </p>
+          <div className="fade-section text-center mb-16">
+            <h2 className="text-4xl md:text-6xl font-bold text-slate-900 mb-4 tracking-tight">Beyond the Classroom</h2>
+            <p className="text-slate-600">Nurturing leadership and creativity.</p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {activities.map((activity) => (
-              <div 
-                key={activity.id}
-                className="activity-card group relative bg-white rounded-2xl p-6 border border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all cursor-pointer overflow-hidden"
-              >
-                {/* Subtle gradient on hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 opacity-0 group-hover:opacity-100 transition-opacity" />
-                
-                <div className="relative">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600 rounded-xl flex items-center justify-center mb-4 group-hover:from-blue-600 group-hover:to-indigo-600 group-hover:text-white transition-all">
-                    <activity.icon className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{activity.title}</h3>
-                  <p className="text-sm text-gray-600 mb-4 leading-relaxed">{activity.desc}</p>
-                  <div className="inline-block px-3 py-1 bg-gray-50 text-gray-700 rounded-full text-xs font-medium border border-gray-100">
-                    {activity.stats}
-                  </div>
+              <div key={activity.id} className="activity-card group bg-white rounded-2xl p-6 border border-slate-100 hover:border-blue-200 hover:shadow-xl transition-all">
+                <div className="w-12 h-12 bg-slate-50 text-blue-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                  <activity.icon className="w-6 h-6" />
                 </div>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">{activity.title}</h3>
+                <p className="text-sm text-slate-500 mb-4 leading-relaxed">{activity.desc}</p>
+                <div className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">{activity.stats}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Values */}
-      <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-gray-50 to-white relative">
-        {/* Subtle accent */}
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-amber-100/30 rounded-full blur-3xl" />
-        
-        <div className="max-w-7xl mx-auto relative">
-          <div className="fade-section text-center mb-16 md:mb-20">
-            <div className="inline-block px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold mb-4">
-              Our Foundation
-            </div>
-            <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4">Values We Live By</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Rooted in timeless principles that shape character
-            </p>
-          </div>
-
+      {/* Values Section */}
+      <section className="py-24 px-6 bg-slate-900 text-white rounded-[3rem] mx-4">
+        <div className="max-w-7xl mx-auto">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {values.map((value, index) => (
-              <div 
-                key={index}
-                className="value-card bg-white rounded-2xl p-8 text-center border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all"
-              >
-                <div className="text-5xl mb-4">{value.icon}</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{value.title}</h3>
-                <p className="text-gray-600 leading-relaxed text-sm">{value.desc}</p>
+              <div key={index} className="value-card p-8 rounded-3xl bg-white/5 border border-white/10 text-center">
+                <div className="text-4xl mb-4">{value.icon}</div>
+                <h3 className="text-xl font-bold mb-3">{value.title}</h3>
+                <p className="text-sm text-blue-100/60 leading-relaxed">{value.desc}</p>
               </div>
             ))}
           </div>
@@ -368,90 +303,35 @@ export default function LifeAtAGJS() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-24 md:py-32 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="fade-section text-center mb-16">
-            <div className="inline-block px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-semibold mb-4">
-              Student Voices
-            </div>
-            <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4">Hear From Our Students</h2>
-          </div>
-
-          <div className="relative">
-            {testimonials.map((testimonial, index) => (
-              <div 
-                key={index}
-                className={`transition-opacity duration-500 ${
-                  index === currentTestimonial ? 'opacity-100' : 'opacity-0 absolute inset-0 pointer-events-none'
-                }`}
-              >
-                <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-2xl p-10 md:p-12 border border-gray-100">
-                  <div className="text-6xl mb-6 text-center">{testimonial.avatar}</div>
-                  <p className="text-2xl text-gray-700 mb-8 text-center leading-relaxed">
-                    "{testimonial.quote}"
-                  </p>
-                  <div className="text-center">
-                    <div className="font-bold text-xl text-gray-900">{testimonial.name}</div>
-                    <div className="text-gray-600">Class {testimonial.class}</div>
-                  </div>
-                </div>
+      <section className="py-32 px-6">
+        <div className="max-w-4xl mx-auto relative">
+          {testimonials.map((t, i) => (
+            <div key={i} className={`transition-all duration-700 transform ${i === currentTestimonial ? 'opacity-100 scale-100' : 'opacity-0 scale-95 absolute inset-0 pointer-events-none'}`}>
+              <div className="text-center">
+                <div className="text-6xl mb-8">{t.avatar}</div>
+                <p className="text-2xl md:text-3xl font-medium text-slate-800 italic mb-8 leading-snug">"{t.quote}"</p>
+                <h4 className="text-xl font-bold text-slate-900">{t.name}</h4>
+                <p className="text-blue-600 font-bold text-sm uppercase tracking-widest mt-1">Class {t.class}</p>
               </div>
-            ))}
-
-            {/* Dots */}
-            <div className="flex justify-center gap-2 mt-8">
-              {testimonials.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentTestimonial(index)}
-                  className={`h-2 rounded-full transition-all ${
-                    index === currentTestimonial ? 'w-8 bg-blue-600' : 'w-2 bg-gray-300'
-                  }`}
-                />
-              ))}
             </div>
+          ))}
+          <div className="flex justify-center gap-3 mt-12">
+            {testimonials.map((_, i) => (
+              <button key={i} onClick={() => setCurrentTestimonial(i)} className={`h-1.5 rounded-full transition-all ${i === currentTestimonial ? 'w-10 bg-blue-600' : 'w-2 bg-slate-200'}`} />
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-24 md:py-32 px-6 bg-gradient-to-br from-blue-600 to-indigo-700 text-white relative overflow-hidden">
-        {/* Subtle accent shapes */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl" />
-        
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/1 rounded-full mb-8">
-            <div className="w-2 h-2 bg-green-400 rounded-full" />
-            <span className="text-sm font-medium">Admissions Open 2025-26</span>
-          </div>
-
-          <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            Ready to Join Our Family?
-          </h2>
-          <p className="text-xl text-blue-100 mb-10 leading-relaxed max-w-2xl mx-auto">
-            Be part of 85 years of excellence where every student matters and every dream finds wings
-          </p>
-
+      {/* Final CTA */}
+      <section className="py-24 px-6 bg-blue-600 text-white text-center">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-4xl md:text-6xl font-bold mb-8 tracking-tight">Join Our Legacy.</h2>
           <div className="flex flex-wrap justify-center gap-4">
-            <a href='/admissions' className="group inline-flex items-center gap-2 hover:bg-blue-500 hover:text-white bg-white text-blue-600 px-8 py-4 rounded-full font-semibold hover:bg-blue-50 transition-all">
-              Apply for Admission
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </a>
-            <a href='/campus-visit' className="inline-flex items-center gap-2 border-2 border-white/40 text-white px-8 py-4 rounded-full font-semibold hover:bg-white/10 transition-all">
-              Schedule Campus Visit
-            </a>
-          </div>
-
-          <div className="mt-12 flex flex-wrap justify-center gap-6 text-sm text-blue-200">
-            <span>📞 +91 78456 90334</span>
-            <span>📧 agjainschool@gmail.com</span>
-            <span>📍 Sowcarpet, Chennai</span>
+            <button className="bg-white text-blue-600 px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition-all">Apply Now</button>
+            <button className="border-2 border-white/30 px-8 py-4 rounded-full font-bold hover:bg-white/10 transition-all">Visit Campus</button>
           </div>
         </div>
-
-        {/* Decorative line at top */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
       </section>
     </div>
   );
