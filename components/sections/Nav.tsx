@@ -24,7 +24,7 @@ export default function Nav() {
         </div>
         
         <div className="middle text-center flex-grow">
-          <h2 className="text-lg md:text-2xl lg:text-4xl font-extrabold text-blue-900 [word-spacing:0.35rem]">
+          <h2 className="text-lg md:text-2xl lg:text-4xl font- font-extrabold text-blue-900 [word-spacing:0.35rem]">
             Shree Amoluckchand Galada Jain
           </h2>
           <h3 className="text-base md:text-xl lg:text-2xl text-blue-800 font-semibold">

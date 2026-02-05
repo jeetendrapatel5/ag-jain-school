@@ -1,179 +1,291 @@
-import { GraduationCap, Users, BookOpen, Layout, Medal, Palette, Monitor, Sparkles } from 'lucide-react';
+'use client';
 
-export default function FacultyExcellence() {
+import React, { useRef, useEffect } from 'react';
+import { 
+  Building2, Award, Shield, Heart, Target, 
+  TrendingUp, Crown, Quote, ArrowUpRight, CheckCircle2, Star, Zap
+} from 'lucide-react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+export default function LeadershipPage() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const leaders = [
+    {
+      name: 'Shri Hanuman Chand Bothra',
+      role: 'Correspondent',
+      icon: Crown,
+      quote: 'Education is the chisel we use to shape the future. We build character, not just careers.',
+    },
+    {
+      name: 'Shri Daljeet Singh Dadha',
+      role: 'Secretary',
+      icon: Shield,
+      quote: 'Excellence is an attitude. We cultivate that attitude in every student, every day.',
+    },
+    {
+      name: 'Dr. K. Jayashree',
+      role: 'Headmistress',
+      credential: 'Ph.D., M.Com',
+      icon: Award,
+      quote: 'Nurturing minds with discipline and love to create global citizens of tomorrow.',
+    }
+  ];
+
+  const committee = [
+    'Prasan Chordia', 'Sajjan Raj Mehta', 'Rajesh Betala', 
+    'Bohra G C', 'Surendra Kumar Singhvi', 'Suresh Chand Bokdia', 'Goutham Chand Gothi'
+  ];
+
+  const history = [
+    { name: 'Shri Goutham Chand Gothi', period: '2023-2025' },
+    { name: 'Shri L. Ashok Bhandari', period: '2022-2023' },
+    { name: 'Shri R. Prakash Chand Bohra', period: '2012-2022' },
+    { name: 'Shri Shanti Kumbhat', period: '2011-2012' },
+    { name: 'Shri Vimal Galada', period: '1991-2011' }
+  ];
+
+  useGSAP(() => {
+    // 1. Initial State
+    gsap.set('.animate-item', { opacity: 0, y: 40 });
+    gsap.set('.hero-title-word', { y: '100%' });
+
+    // 2. Cinematic Hero Reveal
+    const heroTl = gsap.timeline();
+    heroTl.to('.hero-title-word', {
+      y: 0,
+      duration: 1.2,
+      stagger: 0.1,
+      ease: 'expo.out'
+    }).fromTo('.hero-sub', 
+      { opacity: 0, y: 10 }, 
+      { opacity: 1, y: 0, duration: 1 }, 
+      "-=0.8"
+    );
+
+    // 3. Magnetic Hover Effect for Cards
+    const cards = document.querySelectorAll('.magnetic-card');
+    cards.forEach(card => {
+      card.addEventListener('mousemove', (e: any) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        gsap.to(card, {
+          x: x * 0.1,
+          y: y * 0.1,
+          duration: 0.5,
+          ease: 'power2.out'
+        });
+      });
+      card.addEventListener('mouseleave', () => {
+        gsap.to(card, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.3)' });
+      });
+    });
+
+    // 4. Batch Scroll Animation (Optimized)
+    ScrollTrigger.batch('.animate-item', {
+      onEnter: (elements) => {
+        gsap.to(elements, {
+          opacity: 1,
+          y: 0,
+          stagger: 0.15,
+          duration: 1,
+          ease: 'power3.out',
+          overwrite: true
+        });
+      },
+      start: 'top 88%'
+    });
+
+    // 5. Parallax Background Text
+    gsap.to('.bg-parallax-text', {
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 2
+      },
+      xPercent: -20
+    });
+
+    // 6. Liquid Timeline Filling
+    gsap.to('.timeline-line-fill', {
+      scaleY: 1,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.timeline-section',
+        start: 'top 40%',
+        end: 'bottom 60%',
+        scrub: 1.5
+      }
+    });
+
+  }, { scope: containerRef });
+
   return (
-    <div className="bg-[#fafaf9] text-slate-900 font-sans antialiased">
+    <div ref={containerRef} className="bg-white text-[#0A192F] font-[family-name:var(--font-poppins)] selection:bg-blue-500 selection:text-white overflow-x-hidden">
+      
+      {/* Decorative Background Layer */}
+      <div className="fixed top-0 left-0 w-full h-full pointer-events-none opacity-[0.02] mix-blend-multiply z-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+      <div className="bg-parallax-text fixed top-1/2 left-0 text-[25vw] font-black text-slate-100/40 whitespace-nowrap -z-10 select-none uppercase tracking-tighter">
+        Heritage • Vision • Excellence •
+      </div>
+
       {/* Hero Section */}
-      <section className="pt-15 pb-30 px-6 bg-white border-b border-slate-200 overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-1/3 h-full bg-linear-to-l from-amber-50/80 to-transparent pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-amber-100 rounded-full blur-3xl opacity-20" />
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center md:text-left">
-            <div className="flex items-center gap-3 justify-center md:justify-start mb-4">
-              <div className="h-px w-12 bg-amber-600" />
-              <h2 className="text-amber-700 font-semibold tracking-[0.3em] uppercase text-xs">
-                Our Greatest Asset
+      <section className="relative min-h-[85vh] flex flex-col justify-center pt-32 pb-20 px-6">
+        <div className="max-w-7xl mx-auto w-full relative z-10">
+          <div className="hero-sub mb-8 inline-flex items-center gap-3 px-4 py-2 bg-blue-50/50 border border-blue-100 rounded-full backdrop-blur-md">
+            <Zap className="w-3 h-3 text-blue-500 fill-blue-500" />
+            <span className="text-[11px] font-black text-blue-600 uppercase tracking-[0.2em]">Legacy Since 1940</span>
+          </div>
+          
+          <h1 className="text-6xl md:text-9xl font-bold tracking-tighter leading-[0.85] mb-10">
+            <div className="overflow-hidden py-1">
+              <span className="hero-title-word inline-block">Guardians</span>
+            </div>
+            <div className="overflow-hidden py-1 flex">
+              <span className="hero-title-word inline-block text-blue-500">of Excellence</span>
+              <div className='sm:h-5 sm:w-5 h-3 w-3 rounded-4xl bg-green-600 mt-3'></div>
+            </div>
+          </h1>
+
+          <p className="hero-sub text-xl md:text-2xl text-slate-500 max-w-2xl leading-relaxed font-light">
+            Steering the institution with 85 years of <span className="text-[#0A192F] font-semibold">integrity</span>, 
+            modern <span className="text-[#0A192F] font-semibold">foresight</span>, and a commitment to 
+            holistic character building.
+          </p>
+        </div>
+      </section>
+
+      {/* Leadership Grid */}
+      <section className="px-6 py-24 relative z-10">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
+          {leaders.map((leader, i) => (
+            <div key={i} className="animate-item magnetic-card group relative p-10 rounded-[2.5rem] bg-white border border-slate-100 shadow-[0_10px_50px_-15px_rgba(0,0,0,0.05)] hover:shadow-2xl hover:shadow-blue-500/10 transition-shadow duration-500">
+              <div className="w-16 h-16 bg-slate-50 text-[#0A192F] group-hover:bg-blue-500 group-hover:text-white rounded-2xl flex items-center justify-center mb-8 transition-all duration-500 transform group-hover:rotate-6">
+                <leader.icon className="w-8 h-8" />
+              </div>
+              <h3 className="text-2xl font-bold mb-1 tracking-tight">{leader.name}</h3>
+              <p className="text-xs font-black text-blue-500 uppercase tracking-widest mb-8">{leader.role}</p>
+              
+              <div className="pt-8 border-t border-slate-50 relative">
+                <Quote className="absolute -top-3 left-0 w-8 h-8 text-blue-50 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <p className="text-slate-600 leading-relaxed italic text-base">"{leader.quote}"</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Governance Bento */}
+      <section className="py-32 bg-[#0A192F] px-6 text-white overflow-hidden rounded-[4rem] mx-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-12 gap-16 items-center">
+            <div className="lg:col-span-5 animate-item">
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-blue-400 text-xs font-bold uppercase tracking-widest pl-2">Governance</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight tracking-tight">
+                Architects of <br /> Our <span className="text-blue-500">Future.</span>
               </h2>
-            </div>
-            <h1 className="text-5xl md:text-7xl text-slate-900 mb-6 tracking-tight">
-              Faculty Excellence
-            </h1>
-            <p className="text-slate-500 max-w-2xl text-lg font-light leading-relaxed mx-auto md:mx-0">
-              Meet the dedicated educators who inspire, mentor, and shape the future of our students through passion and expertise.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="max-w-7xl mx-auto px-6 py-20">
-        <div className="grid lg:grid-cols-12 gap-12">
-          {/* Sidebar */}
-          <div className="lg:col-span-4">
-            <div className="sticky top-50 space-y-6">
-              {/* Headmistress Card */}
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-b from-amber-500 to-amber-700 rounded-[2.5rem] blur-lg opacity-10 group-hover:opacity-25 transition duration-700" />
-                <div className="relative bg-white border border-amber-100 rounded-[2.5rem] p-10 flex flex-col items-center text-center shadow-xl hover:shadow-2xl transition-all duration-500">
-                  <div className="w-20 h-20 bg-gradient-to-br from-amber-50 to-amber-100 rounded-full flex items-center justify-center mb-6 border-2 border-amber-200 group-hover:scale-110 transition-transform duration-500">
-                    <GraduationCap className="w-8 h-8 text-amber-700" />
-                  </div>
-                  <div className="w-full h-px bg-gradient-to-r from-transparent via-amber-200 to-transparent mb-4" />
-                  <h3 className="text-xs font-bold text-amber-700 uppercase tracking-widest mb-2">
-                    Headmistress
-                  </h3>
-                  <h2 className="text-2xl font-serif text-slate-900 mb-4">
-                    Dr. K. Jayashree
-                  </h2>
-                  <p className="text-slate-500 text-sm italic leading-relaxed">
-                    "Leading with vision and compassion to nurture the leaders of tomorrow."
-                  </p>
-                  <Sparkles className="w-4 h-4 text-amber-400 mt-4 animate-pulse" />
-                </div>
-              </div>
-
-              {/* Support Staff Card */}
-              <div className="relative overflow-hidden bg-slate-900 rounded-[2rem] p-8 text-white group hover:bg-slate-800 transition-colors duration-500">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-600 rounded-full blur-3xl opacity-10 group-hover:opacity-20 transition-opacity" />
-                <div className="relative z-10">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
-                      <Users className="w-5 h-5 text-amber-400" />
-                    </div>
-                    <h4 className="font-bold text-xs uppercase tracking-widest text-amber-400">
-                      Support Staff
-                    </h4>
-                  </div>
-                  <p className="text-sm text-slate-300 leading-relaxed">
-                    Our dedicated non-teaching staff ensure smooth operations, safety, and hygiene across the campus.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Main Content */}
-          <div className="lg:col-span-8 space-y-10">
-            {/* PG Assistants */}
-            <div className="group">
-              <div className="flex items-center gap-4 mb-6">
-                <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400">
-                  PG Assistants
-                </h3>
-                <div className="h-px flex-1 bg-gradient-to-r from-slate-200 to-transparent" />
-              </div>
-              <div className="bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm hover:shadow-xl transition-all duration-500 hover:border-amber-200">
-                <p className="text-sm text-slate-500 mb-6 italic flex items-center gap-2">
-                  Subject experts for Higher Secondary (XI & XII) standards
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {['Mathematics', 'Physics', 'Chemistry', 'Computer Science', 'Economics', 'Accountancy', 'English', 'Tamil/Hindi'].map((subject, idx) => (
-                    <div
-                      key={subject}
-                      className="px-4 py-3 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-xl text-xs font-semibold text-slate-700 border border-slate-200 hover:border-amber-300 hover:shadow-md transition-all duration-300 cursor-pointer text-center"
-                      style={{ animationDelay: `${idx * 50}ms` }}
-                    >
-                      {subject}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* BT Assistants & Secondary Grade */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-white p-8 rounded-[2rem] border border-slate-200 hover:border-blue-300 hover:shadow-xl transition-all duration-500 group">
-                <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-100 transition-colors">
-                  <BookOpen className="text-blue-600 w-6 h-6" />
-                </div>
-                <h4 className="font-serif text-xl mb-2 text-slate-900">BT Assistants</h4>
-                <p className="text-sm text-slate-500 leading-relaxed">
-                  Experienced educators for Middle and High School standards (Classes IX-X).
-                </p>
-              </div>
-              <div className="bg-white p-8 rounded-[2rem] border border-slate-200 hover:border-emerald-300 hover:shadow-xl transition-all duration-500 group">
-                <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-emerald-100 transition-colors">
-                  <Layout className="text-emerald-600 w-6 h-6" />
-                </div>
-                <h4 className="font-serif text-xl mb-2 text-slate-900">Secondary Grade</h4>
-                <p className="text-sm text-slate-500 leading-relaxed">
-                  The foundation builders for our young learners in Classes VI-VIII.
-                </p>
-              </div>
-            </div>
-
-            {/* Special Instructors */}
-            <div>
-              <div className="flex items-center gap-4 mb-6">
-                <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400">
-                  Special Instructors
-                </h3>
-                <div className="h-px flex-1 bg-gradient-to-r from-slate-200 to-transparent" />
-              </div>
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="relative overflow-hidden bg-gradient-to-br from-amber-50 to-amber-100/50 border-2 border-amber-200 p-6 rounded-2xl hover:shadow-xl transition-all duration-500 group">
-                  <div className="absolute top-0 right-0 w-20 h-20 bg-amber-300 rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity" />
-                  <Medal className="w-5 h-5 text-amber-700 mb-3 relative z-10" />
-                  <h5 className="font-bold text-sm mb-1 uppercase tracking-tight text-slate-900 relative z-10">
-                    Physical Education
-                  </h5>
-                  <p className="text-sm font-serif text-slate-800 relative z-10">Shri K.F. Suresh Kumar</p>
-                  <p className="text-[10px] text-amber-700 font-bold mt-1 relative z-10">
-                    M.P.Ed., M.Phil., Ph.D.
-                  </p>
-                </div>
-                <div className="bg-slate-50 border-2 border-slate-200 p-6 rounded-2xl hover:border-purple-300 hover:shadow-xl transition-all duration-500 group">
-                  <Palette className="w-5 h-5 text-purple-500 mb-3 group-hover:text-purple-600 transition-colors" />
-                  <h5 className="font-bold text-sm mb-1 uppercase tracking-tight text-slate-900">
-                    Art & Craft
-                  </h5>
-                  <p className="text-sm font-serif text-slate-800">Shri P. Karthikeyan</p>
-                </div>
-                <div className="bg-slate-50 border-2 border-slate-200 p-6 rounded-2xl hover:border-blue-300 hover:shadow-xl transition-all duration-500 group">
-                  <Monitor className="w-5 h-5 text-blue-500 mb-3 group-hover:text-blue-600 transition-colors" />
-                  <h5 className="font-bold text-sm mb-1 uppercase tracking-tight text-slate-900">
-                    Computer Education
-                  </h5>
-                  <p className="text-sm font-serif text-slate-800">Shri J. Isaac Kumar</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Quote Section */}
-      <section className="max-w-7xl mx-auto px-6">
-        <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-600 to-amber-700 rounded-full blur-xl opacity-20" />
-          <div className="relative bg-gradient-to-r from-amber-600 to-amber-700 p-1 rounded-full">
-            <div className="bg-white rounded-full py-6 px-8 flex items-center justify-center">
-              <p className="text-sm md:text-base font-serif italic text-slate-700 text-center">
-                "Every teacher brings passion, expertise, and commitment to student success."
+              <p className="text-blue-100/60 text-lg mb-10 max-w-md">
+                A distinguished management committee dedicated to maintaining the highest standards of academic and moral leadership.
               </p>
+              <button className="group flex items-center gap-4 bg-white text-[#0A192F] px-8 py-4 rounded-full font-bold hover:bg-blue-500 hover:text-white transition-all duration-500">
+                Strategic Roadmap
+                <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              </button>
+            </div>
+
+            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {committee.map((name, i) => (
+                <div key={i} className="animate-item group p-6 rounded-3xl bg-white/5 border border-white/10 hover:border-blue-500/50 hover:bg-white/10 transition-all duration-500">
+                  <div className="flex items-center gap-4">
+                    <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_#3B82F6]"></div>
+                    <span className="text-sm font-bold tracking-wide group-hover:text-blue-400 transition-colors">{name}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
+
+      {/* History Section (Optimized Tight Spacing) */}
+      <section className="timeline-section py-32 px-6 relative bg-white">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-24 animate-item">
+            <h2 className="text-4xl md:text-6xl font-bold tracking-tighter">Our Legacy</h2>
+            <div className="mt-4 flex items-center justify-center gap-2">
+              <div className="w-12 h-[2px] bg-slate-100"></div>
+              <span className="text-blue-500 text-xs font-black uppercase tracking-[0.3em]">Historical Leaders</span>
+              <div className="w-12 h-[2px] bg-slate-100"></div>
+            </div>
+          </div>
+
+          <div className="relative">
+            {/* The Unified Central Track */}
+            <div className="absolute left-[20px] md:left-1/2 top-0 bottom-0 w-[2px] bg-slate-50 md:-translate-x-1/2 overflow-hidden">
+               <div className="timeline-line-fill absolute top-0 left-0 w-full h-full bg-blue-500 origin-top scale-y-0 shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
+            </div>
+
+            <div className="space-y-12">
+              {history.map((item, i) => (
+                <div key={i} className="animate-item relative flex items-start md:items-center">
+                  
+                  {/* Circle Node */}
+                  <div className="absolute left-[16px] md:left-1/2 w-[10px] h-[10px] bg-white border-2 border-blue-500 rounded-full md:-translate-x-1/2 z-20 mt-1 md:mt-0 shadow-sm" />
+
+                  {/* Content Layout */}
+                  <div className={`w-full flex flex-col md:flex-row items-start md:items-center ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+                    {/* Period Label */}
+                    <div className={`pl-12 md:pl-0 md:w-[50%] flex ${i % 2 === 0 ? 'md:justify-end md:pr-10' : 'md:justify-start md:pl-10'}`}>
+                      <span className="text-[11px] font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+                        {item.period}
+                      </span>
+                    </div>
+
+                    {/* Name Label (Ultra-tight horizontal spacing) */}
+                    <div className={`pl-12 md:pl-0 md:w-[50%] mt-2 md:mt-0 ${i % 2 === 0 ? 'md:pl-10' : 'md:text-right md:pr-10'}`}>
+                      <h4 className="text-lg md:text-xl font-bold text-slate-800 tracking-tight leading-none">{item.name}</h4>
+                      <p className="text-[10px] uppercase tracking-widest text-slate-400 mt-1">Correspondent</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Philosophy / Values */}
+      <section className="py-24 px-6 bg-slate-50 rounded-t-[4rem]">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { t: 'Vision', d: 'Foresight for generations.', i: Target },
+              { t: 'Compassion', d: 'Focus on student welfare.', i: Heart },
+              { t: 'Evolution', d: 'Modern yet traditional.', i: TrendingUp },
+              { t: 'Honor', d: 'Transparent governance.', i: Shield },
+            ].map((v, i) => (
+              <div key={i} className="animate-item group p-8 bg-white rounded-[2rem] border border-slate-100 hover:border-blue-500/30 transition-all duration-500">
+                <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <v.i className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-bold mb-2">{v.t}</h4>
+                <p className="text-sm text-slate-500 leading-relaxed">{v.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }
