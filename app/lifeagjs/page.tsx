@@ -328,8 +328,8 @@ export default function LifeAtAGJS() {
         <div className="max-w-3xl mx-auto">
           <h2 className="text-4xl md:text-6xl font-bold mb-8 tracking-tight">Join Our Legacy.</h2>
           <div className="flex flex-wrap justify-center gap-4">
-            <button className="bg-white text-blue-600 px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition-all">Apply Now</button>
-            <button className="border-2 border-white/30 px-8 py-4 rounded-full font-bold hover:bg-white/10 transition-all">Visit Campus</button>
+            <a href='/admissions' className="bg-white text-blue-600 px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition-all">Apply Now</a>
+            <a href='/amenities' className="border-2 border-white/30 px-8 py-4 rounded-full font-bold hover:bg-white/10 transition-all">Visit Campus</a>
           </div>
         </div>
       </section>

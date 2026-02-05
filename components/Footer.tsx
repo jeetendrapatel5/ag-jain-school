@@ -48,7 +48,7 @@ export default function Footer() {
     <footer ref={footerRef} className="relative bg-[#0A192F] pt-24 pb-12 overflow-hidden font-[family-name:var(--font-poppins)]">
 
       {/* --- 1. The "Negative Space" Top Divider --- */}
-      <div className="absolute top-0 left-0 w-full h-24 bg-white rounded-b-[50px] sm:rounded-b-[50px] z-10 shadow-xl"></div>
+      <div className="absolute top-0 left-0 w-full h-24 bg-white rounded-b-[50px] sm:rounded-b-[30px] z-10 shadow-xl"></div>
 
       {/* --- 2. Dynamic Background Layers --- */}
       <div className="absolute inset-0 z-0">

@@ -90,7 +90,7 @@ export default function Nav() {
         {/* Mobile Menu Items */}
         <div
           className={`overflow-hidden transition-all duration-300 ease-in-out ${
-            isMenuOpen ? 'max-h-96' : 'max-h-0'
+            isMenuOpen ? 'max-h-125' : 'max-h-0'
           }`}
         >
           <div className="flex flex-col bg-blue-500 text-white">
