@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Link from 'next/link';
 import { Heart, Layers, Feather, Leaf, ArrowRight, ArrowUpRight, Sparkles, Star } from 'lucide-react';
 import gsap from 'gsap';
@@ -14,6 +14,11 @@ if (typeof window !== 'undefined') {
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const heroImageRef = useRef<HTMLDivElement>(null);
+  
+  // State for counter numbers
+  const [legacyCount, setLegacyCount] = useState(0);
+  const [studentsCount, setStudentsCount] = useState(0);
+  const [facultyCount, setFacultyCount] = useState(0);
 
   useGSAP(() => {
     // ========== ALL ANIMATIONS ARE SCROLL-TRIGGERED ==========
@@ -364,6 +369,54 @@ export default function Home() {
       }
     });
 
+    // 19. Stats Counter Animations (Scroll Triggered)
+    // This creates the counting animation for: 85+ years, 1000+ students, 90+ faculty
+    
+    // Counter for "85+ years of legacy"
+    gsap.to({ value: 0 }, {
+      value: 85,
+      duration: 2.5,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '.stats-grid',
+        start: 'top 75%',
+        toggleActions: 'play none none none'
+      },
+      onUpdate: function() {
+        setLegacyCount(Math.round(this.targets()[0].value));
+      }
+    });
+    
+    // Counter for "1000+ active students"
+    gsap.to({ value: 0 }, {
+      value: 1000,
+      duration: 2.5,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '.stats-grid',
+        start: 'top 75%',
+        toggleActions: 'play none none none'
+      },
+      onUpdate: function() {
+        setStudentsCount(Math.round(this.targets()[0].value));
+      }
+    });
+    
+    // Counter for "90+ expert faculty"
+    gsap.to({ value: 0 }, {
+      value: 90,
+      duration: 2.5,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '.stats-grid',
+        start: 'top 75%',
+        toggleActions: 'play none none none'
+      },
+      onUpdate: function() {
+        setFacultyCount(Math.round(this.targets()[0].value));
+      }
+    });
+
   }, { scope: containerRef });
 
   return (
@@ -523,7 +576,7 @@ export default function Home() {
               <div className="lg:col-span-7">
                 <div className="stats-wrapper grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
                   {/* Stat 1 */}
-                  <div className="stat-card group hover:text-white text-[#C5A059] text-center lg:text-left p-6 sm:p-8 rounded-2xl bg-white shadow-lg hover:shadow-2xl hover:bg-blue-400 transition-all duration-500 hover:-translate-y-2">
+                  <div className="stat-card group hover:text-white text-[#01174b] text-center lg:text-left p-6 sm:p-8 rounded-2xl bg-white shadow-lg hover:shadow-2xl hover:bg-blue-400 transition-all duration-500 hover:-translate-y-2">
                     <div className="relative inline-block">
                       <div className="stat-counter text-4xl sm:text-5xl lg:text-6xl font-bold bg-clip-text" data-target="1940"><p>1940</p></div>
                       <div className="absolute -inset-2 bg-[#C5A059]/10 rounded-lg blur-xl -z-10 group-hover:bg-[#C5A059]/20 transition-all duration-500"></div>
@@ -541,7 +594,7 @@ export default function Home() {
                   </div>
 
                   {/* Stat 3 */}
-                  <div className="text-[#C5A059] hover:text-white hover:bg-blue-400 stat-card group text-center lg:text-left p-6 sm:p-8 rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                  <div className="text-[#01174b] hover:text-white hover:bg-blue-400 stat-card group text-center lg:text-left p-6 sm:p-8 rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
                     <div className="relative inline-block">
                       <div className="stat-counter text-4xl sm:text-5xl lg:text-6xl font-bold bg-clip-text" data-target="100" data-suffix="%">0%</div>
                       <div className="absolute -inset-2 bg-[#C5A059]/10 rounded-lg blur-xl -z-10 group-hover:bg-[#C5A059]/20 transition-all duration-500"></div>
@@ -776,8 +829,60 @@ export default function Home() {
         </div>
       </section>
 
+      {/* --- STATS SECTION --- */}
+      <section className="py-16 sm:py-24 px-4 sm:px-6 bg-gradient-to-b from-white to-[#FAFAFA]">
+        <div className="max-w-[1400px] mx-auto">
+          {/* Section Header */}
+          <div className="text-center mb-12 sm:mb-16">
+            <div className="inline-block mb-8 px-4 sm:px-6 py-2 bg-[#dcf0f8] rounded-full">
+              <span className="text-[#249ae9] font-bold tracking-[0.2em] uppercase text-xs sm:text-sm">Our Impact</span>
+            </div>
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#0A192F] leading-tight">
+              By The <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0088e2] to-[#33a7eb]">Numbers</span>
+            </h2>
+          </div>
+
+          {/* Stats Grid */}
+          <div className="stats-grid grid grid-cols-1 md:grid-cols-3 gap-12 sm:gap-16">
+            
+            {/* Stat 1: 85+ Years of Legacy */}
+            <div className="stat-item text-center">
+              <div className="text-6xl sm:text-7xl lg:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#0088e2] to-[#33a7eb] mb-4">
+                {legacyCount}+
+              </div>
+              <div className="text-lg sm:text-xl font-bold text-[#0A192F] mb-2">Years of Legacy</div>
+              <div className="text-sm text-slate-600">Building excellence since 1940</div>
+            </div>
+
+            {/* Stat 2: 1000+ Active Students */}
+            <div className="stat-item text-center">
+              <div className="text-6xl sm:text-7xl lg:text-8xl font-bold text-[#0A192F] mb-4">
+                {studentsCount}+
+              </div>
+              <div className="text-lg sm:text-xl font-bold text-[#0A192F] mb-2">Active Students</div>
+              <div className="text-sm text-slate-600">Shaping future leaders</div>
+            </div>
+
+            {/* Stat 3: 90+ Expert Faculty */}
+            <div className="stat-item text-center">
+              <div className="text-6xl sm:text-7xl lg:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#C5A059] to-[#d4b068] mb-4">
+                {facultyCount}+
+              </div>
+              <div className="text-lg sm:text-xl font-bold text-[#0A192F] mb-2">Expert Faculty</div>
+              <div className="text-sm text-slate-600">Dedicated mentors & guides</div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       {/* Custom CSS for Animations - FIXED */}
       <style jsx>{`
+        /* Smooth Scroll for entire page */
+        html {
+          scroll-behavior: smooth;
+        }
+        
         @keyframes gradient {
           0%, 100% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }

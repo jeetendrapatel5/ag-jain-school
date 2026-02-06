@@ -72,7 +72,7 @@ export default function Footer() {
             <div className="flex flex-col items-center gap-3 mb-8">
               <h2 className="text-3xl text-center font-bold text-white pb-5">Shree Amoluckchand Galada Jain</h2>
               <p className='text-xl font-semibold text-zinc-200'>Higher Secondary School</p>
-              <p className='text-xs  text-zinc-200'>A unit of Sri S.S. Jain Educational Society (Religious Linguistic Minority Society)</p>
+              <p className='text-xs text-center text-zinc-200'>A unit of Sri S.S. Jain Educational Society (Religious Linguistic Minority Society)</p>
               <p className='font-bold text-zinc-200'>Recognised by Tamil Naidu State Board</p>
               <p className="text-blue-100/90 text-center leading-relaxed mb-10 max-w-md italic">
                 "Building foundations of character and excellence since 1940."
@@ -113,7 +113,7 @@ export default function Footer() {
 
                 <div className="space-y-8">
                   <div className="flex gap-6 items-start group">
-                    <div className="p-4 bg-blue-500/10 rounded-2xl text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all duration-500">
+                    <div className="p-4 bg-blue-500/10 rounded-full text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all duration-500">
                       <MapPin className="w-6 h-6" />
                     </div>
                     <div>
@@ -123,7 +123,7 @@ export default function Footer() {
                   </div>
 
                   <div className="flex gap-6 items-center group">
-                    <div className="p-4 bg-blue-500/10 rounded-2xl text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all duration-500">
+                    <div className="p-4 bg-blue-500/10 rounded-full text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all duration-500">
                       <Mail className="w-6 h-6" />
                     </div>
                     <div>
