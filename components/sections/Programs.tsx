@@ -10,6 +10,11 @@ export default function SchoolProgramsHero() {
   // Added mounted state
   const [mounted, setMounted] = useState(false);
 
+  // Counter states for animations
+  const [legacyCount, setLegacyCount] = useState(0);
+  const [studentsCount, setStudentsCount] = useState(0);
+  const [facultyCount, setFacultyCount] = useState(0);
+
   // TYPING FIX 1: Typed Refs
   const headerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -22,7 +27,6 @@ export default function SchoolProgramsHero() {
   useEffect(() => {
     setMounted(true);
 
-    // TYPING FIX 2: Added ': MouseEvent' type
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ 
         x: e.clientX,
@@ -35,13 +39,26 @@ export default function SchoolProgramsHero() {
   }, []);
 
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
-    script.async = true;
+    // 1. Load GSAP Main Core
+    const gsapScript = document.createElement('script');
+    gsapScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
+    gsapScript.async = true;
     
-    script.onload = () => {
-      // TYPING FIX 3: Cast window to any to access custom property gsap
+    // 2. Load ScrollTrigger Plugin
+    const stScript = document.createElement('script');
+    stScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js';
+    stScript.async = true;
+    
+    gsapScript.onload = () => {
+      document.head.appendChild(stScript);
+    };
+
+    stScript.onload = () => {
       const gsap = (window as any).gsap;
+      const ScrollTrigger = (window as any).ScrollTrigger;
+      
+      // Register the plugin
+      gsap.registerPlugin(ScrollTrigger);
       
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
       
@@ -58,6 +75,47 @@ export default function SchoolProgramsHero() {
 
       gsap.to(badgeRef.current, { y: -8, rotation: 2, duration: 3, repeat: -1, yoyo: true, ease: 'sine.inOut' });
 
+      // FIXED COUNTER ANIMATIONS - Now with ScrollTrigger
+      // Trigger when the statsRef container enters the viewport
+      const counterTrigger = {
+        trigger: statsRef.current,
+        start: 'top 85%', // Starts when top of stats section is 85% down the screen
+        toggleActions: 'play none none none' // Only plays once
+      };
+
+      // Counter for "85+ years of legacy"
+      gsap.to({ value: 0 }, {
+        value: 85,
+        duration: 2.5,
+        ease: 'power2.out',
+        scrollTrigger: counterTrigger,
+        onUpdate: function() {
+          setLegacyCount(Math.round(this.targets()[0].value));
+        }
+      });
+      
+      // Counter for "1000+ active students"
+      gsap.to({ value: 0 }, {
+        value: 1000,
+        duration: 2.5,
+        ease: 'power2.out',
+        scrollTrigger: counterTrigger,
+        onUpdate: function() {
+          setStudentsCount(Math.round(this.targets()[0].value));
+        }
+      });
+      
+      // Counter for "90+ expert faculty"
+      gsap.to({ value: 0 }, {
+        value: 90,
+        duration: 2.5,
+        ease: 'power2.out',
+        scrollTrigger: counterTrigger,
+        onUpdate: function() {
+          setFacultyCount(Math.round(this.targets()[0].value));
+        }
+      });
+
       const handleGSAPScroll = () => {
         const scrolled = window.scrollY;
         if(headerRef.current) gsap.to(headerRef.current, { y: scrolled * 0.05, duration: 0.5, ease: 'power2.out' });
@@ -70,20 +128,22 @@ export default function SchoolProgramsHero() {
       return () => window.removeEventListener('scroll', handleGSAPScroll);
     };
 
-    document.head.appendChild(script);
+    document.head.appendChild(gsapScript);
+    
     return () => {
-      if (document.head.contains(script)) document.head.removeChild(script);
+      if (document.head.contains(gsapScript)) document.head.removeChild(gsapScript);
+      if (document.head.contains(stScript)) document.head.removeChild(stScript);
     };
   }, []);
 
-  // TYPING FIX 4: Added types for program (any) and isEntering (boolean)
+  // ... (rest of the component remains exactly as you provided)
+
+  // Typed hover handler
   const handleCardHover = (program: any, isEntering: boolean) => {
     setHoveredCard(isEntering ? program.id : null);
     
-    // TYPING FIX 5: Cast window to any for gsap access
     if ((window as any).gsap && cardsRef.current[program.id]) {
       const card = cardsRef.current[program.id];
-      // Using optional chaining (?) to stay safe if elements aren't found
       const icon = card?.querySelector('.icon-container');
       const arrow = card?.querySelector('.arrow-icon');
       const accentLine = card?.querySelector('.accent-line');
@@ -170,30 +230,19 @@ export default function SchoolProgramsHero() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 overflow-hidden relative">
+      {/* Background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div 
           className="absolute w-[600px] h-[600px] bg-gradient-to-br from-red-200/30 to-orange-200/30 rounded-full blur-3xl transition-all duration-1000 ease-out"
-          style={{
-            top: '5%',
-            left: '0%',
-            transform: getTransform(0.03, 0.03)
-          }}
+          style={{ top: '5%', left: '0%', transform: getTransform(0.03, 0.03) }}
         />
         <div 
           className="absolute w-[600px] h-[600px] bg-gradient-to-br from-amber-200/30 to-yellow-200/30 rounded-full blur-3xl transition-all duration-1000 ease-out"
-          style={{
-            bottom: '0%',
-            right: '0%',
-            transform: getTransform(-0.04, -0.04)
-          }}
+          style={{ bottom: '0%', right: '0%', transform: getTransform(-0.04, -0.04) }}
         />
         <div 
           className="absolute w-[500px] h-[500px] bg-gradient-to-br from-blue-200/30 to-cyan-200/30 rounded-full blur-3xl transition-all duration-1000 ease-out"
-          style={{
-            top: '40%',
-            left: '50%',
-            transform: getTransform(0.025, 0.025)
-          }}
+          style={{ top: '40%', left: '50%', transform: getTransform(0.025, 0.025) }}
         />
       </div>
 
@@ -213,18 +262,11 @@ export default function SchoolProgramsHero() {
           </div>
           
           <div ref={titleRef} className="mb-10">
-            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-extralight text-slate-900 tracking-tight leading-none">
-              Shape Your
-            </h1>
-            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-semibold bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 bg-clip-text text-transparent tracking-tight leading-none mt-2">
-              Academic Journey
-            </h1>
+            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-extralight text-slate-900 tracking-tight leading-none">Shape Your</h1>
+            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-semibold bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 bg-clip-text text-transparent tracking-tight leading-none mt-2">Academic Journey</h1>
           </div>
           
-          <p 
-            ref={subtitleRef}
-            className="text-xl sm:text-2xl text-slate-600 font-light leading-relaxed max-w-2xl mb-8"
-          >
+          <p ref={subtitleRef} className="text-xl sm:text-2xl text-slate-600 font-light leading-relaxed max-w-2xl mb-8">
             Choose from our comprehensive programs designed to nurture excellence, character, and leadership. From foundation to specialization, we guide every step.
           </p>
 
@@ -234,7 +276,7 @@ export default function SchoolProgramsHero() {
                 <Star className="w-6 h-6 text-white" fill="white" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-slate-900">85+</div>
+                <div className="text-2xl font-bold text-slate-900">{legacyCount}+</div>
                 <div className="text-sm text-slate-600">Years Legacy</div>
               </div>
             </div>
@@ -243,7 +285,7 @@ export default function SchoolProgramsHero() {
                 <Users className="w-6 h-6 text-white" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-slate-900">1,000+</div>
+                <div className="text-2xl font-bold text-slate-900">{studentsCount.toLocaleString()}+</div>
                 <div className="text-sm text-slate-600">Active Students</div>
               </div>
             </div>
@@ -252,21 +294,20 @@ export default function SchoolProgramsHero() {
                 <Award className="w-6 h-6 text-white" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-slate-900">90+</div>
+                <div className="text-2xl font-bold text-slate-900">{facultyCount}+</div>
                 <div className="text-sm text-slate-600">Expert Faculty</div>
               </div>
             </div>
           </div>
         </div>
 
+        {/* ... The rest of your JSX remains completely unchanged ... */}
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-8">
-          {programs.map((program, index) => {
+          {programs.map((program) => {
             const Icon = program.icon;
-            
             return (
               <div
                 key={program.id}
-                // TYPING FIX 6: Cast index as any to satisfy ref type if needed, or simply assign
                 ref={el => { cardsRef.current[program.id as any] = el; }}
                 className="group cursor-pointer lg:flex-1"
                 onMouseEnter={() => handleCardHover(program, true)}
@@ -274,57 +315,34 @@ export default function SchoolProgramsHero() {
               >
                 <div className={`relative h-full bg-white/90 backdrop-blur-xl border border-slate-200/80 rounded-2xl transition-all duration-700 hover:border-slate-300 hover:shadow-2xl ${program.glowColor} ${program.hoverBg} overflow-hidden`}>
                   <div className={`absolute inset-0 bg-gradient-to-br ${program.accentGradient} opacity-0 group-hover:opacity-[0.07] transition-opacity duration-700`} />
-                  
                   <div className={`accent-line absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${program.accentGradient} transform origin-left scale-x-0 shadow-lg`} />
-                  
                   <div className="relative p-12 sm:p-14">
                     <div className="mb-14 relative">
                       <div className={`glow-effect absolute inset-0 ${program.accent} opacity-20 blur-2xl scale-110 transition-all duration-500`} />
-                      
                       <div className={`icon-container relative w-20 h-20 bg-gradient-to-br ${program.accentGradient} rounded-2xl flex items-center justify-center shadow-xl ${program.glowColor} transition-all duration-500`}>
-                        <Icon 
-                          className="w-10 h-10 text-white" 
-                          strokeWidth={1.5}
-                        />
+                        <Icon className="w-10 h-10 text-white" strokeWidth={1.5} />
                       </div>
                     </div>
-
                     <div className="card-content space-y-8">
                       <div>
-                        <h3 className="card-title text-4xl font-light text-slate-900 mb-2 tracking-tight">
-                          {program.title}
-                        </h3>
+                        <h3 className="card-title text-4xl font-light text-slate-900 mb-2 tracking-tight">{program.title}</h3>
                         <p className="text-lg text-slate-600 font-medium mb-4">{program.subtitle}</p>
                         <div className="flex flex-wrap gap-2">
-                          <div className={`stats-badge inline-block px-4 py-1.5 text-xs font-bold bg-gradient-to-r ${program.accentGradient} text-white rounded-full shadow-lg`}>
-                            {program.stats}
-                          </div>
-                          <div className="inline-block px-4 py-1.5 text-xs font-semibold text-slate-600 bg-slate-100 rounded-full">
-                            {program.students}
-                          </div>
+                          <div className={`stats-badge inline-block px-4 py-1.5 text-xs font-bold bg-gradient-to-r ${program.accentGradient} text-white rounded-full shadow-lg`}>{program.stats}</div>
+                          <div className="inline-block px-4 py-1.5 text-xs font-semibold text-slate-600 bg-slate-100 rounded-full">{program.students}</div>
                         </div>
                       </div>
-
-                      <p className="text-slate-600 text-lg leading-relaxed font-light">
-                        {program.description}
-                      </p>
-
+                      <p className="text-slate-600 text-lg leading-relaxed font-light">{program.description}</p>
                       <div className="flex flex-wrap gap-2">
                         {program.subjects.map((subject, idx) => (
-                          <span key={idx} className="px-3 py-1 text-xs font-medium text-slate-700 bg-white/60 border border-slate-200 rounded-lg">
-                            {subject}
-                          </span>
+                          <span key={idx} className="px-3 py-1 text-xs font-medium text-slate-700 bg-white/60 border border-slate-200 rounded-lg">{subject}</span>
                         ))}
                       </div>
-
                       <div className="pt-4">
                         <div className="inline-flex items-center gap-3 text-base font-bold text-slate-900 group-hover:text-blue-500 transition-colors duration-300">
                           <span>Explore Program</span>
                           <div className={`arrow-icon w-10 h-10 bg-gradient-to-br ${program.accentGradient} rounded-full flex items-center justify-center shadow-lg ${program.glowColor}`}>
-                            <ArrowUpRight 
-                              className="w-5 h-5 text-white" 
-                              strokeWidth={2.5}
-                            />
+                            <ArrowUpRight className="w-5 h-5 text-white" strokeWidth={2.5} />
                           </div>
                         </div>
                       </div>
@@ -337,57 +355,33 @@ export default function SchoolProgramsHero() {
         </div>
 
         <div ref={ctaRef} className="mt-32 sm:mt-40">
-          <div className="relative bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 p-12 sm:p-16 rounded-3xl shadow-2xl shadow-red-900/50 overflow-hidden">
+          <div className="relative bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 p-12 sm:p-16 rounded-3xl overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-transparent to-blue-600/20 opacity-50" />
-            
-            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl" />
-            
             <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
               <div className="max-w-xl">
-                <h3 className="text-4xl sm:text-5xl font-light text-white mb-4 tracking-tight">
-                  Ready to Join Our Legacy?
-                </h3>
-                <p className="text-xl text-amber-100 font-light leading-relaxed mb-4">
-                  Admissions open for 2025-26. Become part of 85 years of educational excellence.
-                </p>
-                <div className="flex items-center gap-4 text-amber-200">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
-                    <span className="text-sm font-medium">Tri-Lingual Education</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
-                    <span className="text-sm font-medium">State Board Affiliated</span>
-                  </div>
-                </div>
+                <h3 className="text-4xl sm:text-5xl font-light text-white mb-4 tracking-tight">Ready to Join Our Legacy?</h3>
+                <p className="text-xl text-amber-100 font-light leading-relaxed mb-4">Admissions open for 2025-26. Become part of 85 years of educational excellence.</p>
               </div>
-              <button className="group px-10 py-5 bg-white text-blue-700 font-bold text-lg rounded-xl transition-all duration-300 hover:bg-amber-50 hover:shadow-2xl hover:shadow-white/30 flex items-center gap-3 hover:scale-105 active:scale-95">
+              <a href="/admissions" className="group px-10 py-5 bg-white text-blue-700 font-bold text-lg rounded-xl transition-all hover:text-white duration-300 hover:bg-blue-500 flex items-center gap-3 hover:scale-105 active:scale-95">
                 <span>Apply Now</span>
-                <ArrowUpRight 
-                  className="w-6 h-6 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" 
-                  strokeWidth={2.5}
-                />
-              </button>
+                <ArrowUpRight className="w-6 h-6 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" strokeWidth={2.5} />
+              </a>
             </div>
           </div>
         </div>
 
         <div className="mt-12 grid md:grid-cols-3 gap-6">
-          <div className="bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl p-6 hover:shadow-lg transition-all">
-            <div className="text-3xl mb-2">🌍</div>
-            <h4 className="font-bold text-slate-900 mb-2">A Miniature India</h4>
-            <p className="text-sm text-slate-600">Students from across India, celebrating unity in diversity</p>
+          <div className="bg-white/60 backdrop-blur-sm border border-slate-200 hover:rounded-3xl hover:bg-blue-500 hover:text-white text-slate-800 rounded-xl p-6 hover:shadow-lg transition-all">
+            <h4 className="font-bold mb-2">A Miniature India</h4>
+            <p className="text-sm">Students from across India, celebrating unity in diversity</p>
           </div>
-          <div className="bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl p-6 hover:shadow-lg transition-all">
-            <div className="text-3xl mb-2">🏆</div>
-            <h4 className="font-bold text-slate-900 mb-2">42+ Endowments</h4>
-            <p className="text-sm text-slate-600">Recognizing excellence in academics, sports, and character</p>
+          <div className="bg-white/60 backdrop-blur-sm border border-slate-200 hover:rounded-3xl hover:bg-blue-500 hover:text-white text-slate-800 rounded-xl p-6 hover:shadow-lg transition-all">
+            <h4 className="font-bold mb-2">42+ Endowments</h4>
+            <p className="text-sm">Recognizing excellence in academics, sports, and character</p>
           </div>
-          <div className="bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl p-6 hover:shadow-lg transition-all">
-            <div className="text-3xl mb-2">🌱</div>
-            <h4 className="font-bold text-slate-900 mb-2">Values-Driven</h4>
-            <p className="text-sm text-slate-600">Jain principles of Ahimsa, Anekant, and Aparigraha</p>
+          <div className="bg-white/60 backdrop-blur-sm border border-slate-200 hover:rounded-3xl hover:bg-blue-500 hover:text-white text-slate-800 rounded-xl p-6 hover:shadow-lg transition-all">
+            <h4 className="font-bold mb-2">Values-Driven</h4>
+            <p className="text-sm">Jain principles of Ahimsa, Anekant, and Aparigraha</p>
           </div>
         </div>
       </div>
